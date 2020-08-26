@@ -25,8 +25,8 @@ def merge_image(image,x,y,stepW,stepH,nums,image_name,bg_path):
     img_background[y_start:y_end,x_start:x_end]=img_froeground
     #save
     count=nums
-    if count<=4:
-        save_path='./merge_image_original_bk_done/'+image_name+'_cut_'+str(count)+'.png'
+    if count<=200:
+        save_path='./Data_original/new_sliding_single_select/'+image_name+'_cut_'+str(count)+'.jpg'
         cv2.imwrite(save_path,img_background)
     #retutn
     return img_background
@@ -100,16 +100,16 @@ def main_sliding(image,start_point,sliding_window_size,img_name,background_path,
                 print('next...')
                 #save_path='./subimage_600x600_nospace_singleobject/'+img_name+'_'+str(count)+'.png'
                 #merge_image_save_path='./merge_image_600x600_nospace_singleobject/'+img_name+'_'+str(count)+'.png'
-                merge_image_save_name=img_name+'_'+str(count)+'.png'
+                merge_image_save_name=img_name+'_'+str(count)+'.jpg'
                 #cv2.imwrite(save_path,img_sliding_crop)
-                
+                '''
                 jsn['imageWidth']  = img_merge.shape[0]
                 jsn['imageHeight'] = img_merge.shape[1]
                 jsn['imagePath']   = merge_image_save_name
                 new_jsn_basename = img_name + '_'+str(count)+'.json'
                 new_jsn_save_dir= './merge_image_original_bk_done/'
                 new_jsn_filepath = os.path.join(new_jsn_save_dir, new_jsn_basename)
-                '''
+                
                 for shape in jsn['shapes']:
                     #labels.append(shape['label'])
                     points = shape['points']
@@ -118,20 +118,20 @@ def main_sliding(image,start_point,sliding_window_size,img_name,background_path,
                         [x4, y4]
                         ]
                     shape['shape_type'] = 'rectangle'
-                '''
+                
                 with open(new_jsn_filepath, 'w') as fp:
                     json.dump(jsn, fp, indent=4)       
-                
+                '''
             cv2.imshow("Window", clone)
             cv2.waitKey(1)
-            time.sleep(0.8000)
+            time.sleep(0.5000)
             count+=1
 ####################################################################################################
 def basic_setting(filepath):
     img_filepath = filepath
     print('img_filepath ==',img_filepath)
     # background
-    background_path='background03.png'
+    background_path='./image_background/background01.jpg'
     img_basename = os.path.basename(img_filepath)#include(.jpg)
     print('img_basename ==',img_basename)
     image=cv2.imread(img_filepath)
@@ -170,14 +170,15 @@ def basic_setting(filepath):
 
     # stepsize and start point(xmin,ymin)
     # stepsize
-    set_stepSize_x=round(W_BB*(1-proportion))
-    set_stepSize_y=round(H_BB*(1-proportion))
+    stepSize_proportion=0.2
+    set_stepSize_x=round(W_BB*(stepSize_proportion))
+    set_stepSize_y=round(H_BB*(stepSize_proportion))
     set_stepSize=(set_stepSize_x,set_stepSize_y)
     # start point(x_start,y_start,x_end,y_end)
-    x_start=round(xmin)
-    y_start=round(ymin)
-    x_end=round(xmin)+round(W_BB*(1-proportion))*2
-    y_end=round(ymin)+round(H_BB*(1-proportion))*2
+    x_start=round(xmin)-round(W_BB)+(set_stepSize_x*3)
+    y_start=round(ymin)-round(H_BB)+(set_stepSize_y*3)
+    x_end=round(xmin)+round(W_BB*(1-stepSize_proportion)-set_stepSize_x)
+    y_end=round(ymin)+round(H_BB*(1-stepSize_proportion)-set_stepSize_y)
     start_point=(x_start,y_start,x_end,y_end,set_stepSize)
     
     # main_sliding()
